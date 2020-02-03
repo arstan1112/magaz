@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Category;
+use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ProductController extends AbstractController
@@ -23,14 +26,25 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Route("/", name="product")
+     * @Route("/", name="products.list")
      */
-    public function index()
+    public function list()
     {
-//        $products = $this->em->getRepository();
-
+        $products = $this->em->getRepository(Product::class)->findAll();
         return $this->render('product/index.html.twig', [
-            'intent' => 'intent',
+            'products' => $products,
+        ]);
+    }
+
+    /**
+     * @Route("/show", name="product.show")
+     *
+     * @return Response
+     */
+    public function show()
+    {
+        return $this->render('base.html.twig', [
+//            'products' => $products,
         ]);
     }
 }

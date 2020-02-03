@@ -63,7 +63,7 @@ class PaymentController extends AbstractController
     {
         \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
 
-        $endpoint_secret = 'whsec_RF4ZWQRsYu3HNHXfwMsR7ngdp9v5GP4e';
+        $endpoint_secret = 'whsec_NjDvwBC3LRE6ek0R4ph9heXM4yKrojZa';
 
         $payload = @file_get_contents('php://input');
         $sig_header = $request->server->get('HTTP_STRIPE_SIGNATURE');
@@ -76,11 +76,13 @@ class PaymentController extends AbstractController
                 $payload, $sig_header, $endpoint_secret
             );
         } catch (\UnexpectedValueException $e) {
-            http_response_code(400);
+//            http_response_code(400);
+            http_response_code(401);
 
             exit();
         } catch (\Stripe\Exception\SignatureVerificationException $e) {
-            http_response_code(400);
+//            http_response_code(400);
+            http_response_code(402);
             exit();
         }
 

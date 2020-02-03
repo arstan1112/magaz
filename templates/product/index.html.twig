@@ -2,4 +2,29 @@
 
 {% block title %}Magaz Homepage{% endblock %}
 
+{% block body %}
 
+   {% include 'product/slider.html.twig' %}
+    <br>
+    <br>
+        <div class="container">
+            <div class="row">
+                {% for product in products %}
+                    <div class="col-sm">
+                        <div class="card" style="width: 18rem;">
+                            <img class="card-img-top" src="{{ asset(images_directory ~ '/' ~ 'apple.webp') }}" alt="Card image cap">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <p class="card-text">{{ product.description }}</p>
+                                <i>
+                                    <a href="#">{{ product.category.name }}</a>
+                                </i>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                 {% endfor %}
+            </div>
+        </div>
+
+{% endblock %}
