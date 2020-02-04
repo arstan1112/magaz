@@ -24,8 +24,11 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry('app', './assets/js/app.js')
-    .addEntry('payment', './assets/js/payment.js')
-    .addStyleEntry('paymentStyle', './assets/css/paymentStyle.css')
+    .addEntry('stripe_payment', './assets/js/stripe_payment.js')
+    .addEntry('stripe_subscription', './assets/js/stripe_subscription.js')
+    .addStyleEntry('stripe_payment_style', './assets/css/stripe_payment.css')
+    .addStyleEntry('stripe_subscription_global_style', './assets/css/stripe_subscription_global.css')
+    .addStyleEntry('stripe_subscription_normalize_style', './assets/css/stripe_subscription_normalize.css')
     //.addEntry('page1', './assets/js/page1.js')
     //.addEntry('page2', './assets/js/page2.js')
 

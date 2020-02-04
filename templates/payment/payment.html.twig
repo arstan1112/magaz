@@ -4,7 +4,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {{ encore_entry_link_tags('paymentStyle') }}
+    {{ encore_entry_link_tags('stripe_payment_style') }}
 {% endblock %}
 
 {% block body %}
@@ -29,6 +29,6 @@
 {% endblock %}
 
 {% block javascripts %}
-     <script src="https://js.stripe.com/v3/"></script>
-     {{ encore_entry_script_tags('payment') }}
+{#     <script src="https://js.stripe.com/v3/"></script>#}
+     {{ encore_entry_script_tags('stripe_payment') }}
 {% endblock %}

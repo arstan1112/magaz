@@ -3,6 +3,12 @@
 {% block title %}Admin Panel{% endblock %}
 
 {% block body %}
+    <div class="float-right">
+        <a href="{{ path('admin.user.create') }}"><button class="btn btn-success">Create</button></a>
+    </div>
+    <br>
+    <br>
+    <br>
     {% for user in users %}
         <ul class="list-group">
             <li class="list-group-item list-group-item-light">
@@ -14,7 +20,7 @@
                 </div>
                 <div class="float-right">
                     <a href="#"><button class="btn btn-primary">Edit</button></a>
-                    <a href="#"><button class="btn btn-primary">Delete</button></a>
+                    <a href="#"><button class="btn btn-danger">Delete</button></a>
                 </div>
             </li>
         </ul>
