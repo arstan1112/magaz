@@ -9,6 +9,18 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Product
 {
+    public const PRICING_PLAN_INTERVAL_DAY   = 'day';
+    public const PRICING_PLAN_INTERVAL_WEEK  = 'week';
+    public const PRICING_PLAN_INTERVAL_MONTH = 'month';
+    public const PRICING_PLAN_INTERVAL_YEAR  = 'year';
+
+    public const PRICING_PLAN_INTERVAL = [
+        self::PRICING_PLAN_INTERVAL_DAY,
+        self::PRICING_PLAN_INTERVAL_WEEK,
+        self::PRICING_PLAN_INTERVAL_MONTH,
+        self::PRICING_PLAN_INTERVAL_YEAR,
+    ];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -40,6 +52,11 @@ class Product
      * @ORM\ManyToOne(targetEntity="App\Entity\Category", inversedBy="products")
      */
     private $category;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $pricingPlanId;
 
     public function getId(): ?int
     {
@@ -102,6 +119,18 @@ class Product
     public function setCategory(?Category $category): self
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getPricingPlanId(): ?string
+    {
+        return $this->pricingPlanId;
+    }
+
+    public function setPricingPlanId(?string $pricingPlanId): self
+    {
+        $this->pricingPlanId = $pricingPlanId;
 
         return $this;
     }

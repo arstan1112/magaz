@@ -53,3 +53,4 @@ security:
         - { path: ^/payment$, roles: ROLE_USER }
         - { path: ^/show$, roles: ROLE_USER }
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/subscribe, roles: ROLE_USER }

@@ -54,23 +54,27 @@ form.addEventListener('submit', function(event) {
     // which would refresh the page.
     event.preventDefault();
     console.log('customlog: subscribe button pressed');
-
-    stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-        billing_details: {
-            email: 'jenny.rosen@example.com',
-        },
-    }).then(stripePaymentMethodHandler);
+    var pricingPlan   = document.getElementById('pricingPlan').value;
+    if (!pricingPlan) {
+        alert('No pricing plan found. Can\'t subscribe');
+    } else {
+        stripe.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+            billing_details: {
+                email: 'jenny.rosen@example.com',
+            },
+        }).then(stripePaymentMethodHandler);
+    }
 });
 
 
-var customerEmail = document.getElementById('email').value;
-console.log('customerEmail');
-console.log(customerEmail);
-
 // Script.js
 function stripePaymentMethodHandler(result, email) {
+    var customerEmail = document.getElementById('email').value;
+    var pricingPlan   = document.getElementById('pricingPlan').value;
+    console.log('customerEmail');
+    console.log(customerEmail);
     if (result.error) {
         console.log(result.error);
         // Show error in payment form
@@ -79,18 +83,20 @@ function stripePaymentMethodHandler(result, email) {
         console.log('customlog: stripePaymentMethodHandler called');
         console.log(result.paymentMethod.id);
 
-        fetch('/create-customer', {
+        fetch('/subscribe', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 email: customerEmail,
-                payment_method: result.paymentMethod.id
+                payment_method: result.paymentMethod.id,
+                pricing_plan: pricingPlan,
             }),
         }).then(function(result) {
             return result.json();
         }).then(function(customer) {
-            console.log('customlog: customer created')
+            console.log('customlog: customer created');
             // The customer has been created
+            window.location.href = '/success';
         });
     }
 }
@@ -107,9 +113,12 @@ function stripePaymentMethodHandler(result, email) {
 //     if (status === 'requires_action') {
 //         stripe.confirmCardPayment(client_secret).then(function(result) {
 //             if (result.error) {
+//                 console.log(result.error);
+//                 console.log(result.error.message);
 //                 // Display error message in your UI.
 //                 // The card was declined (i.e. insufficient funds, card has expired, etc)
 //             } else {
+//                 alert('Subscription succeeded');
 //                 // Show a success message to your customer
 //             }
 //         });

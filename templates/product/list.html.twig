@@ -4,12 +4,13 @@
 
 {% block body %}
 
-   {% include 'product/slider.html.twig' %}
+{% include 'product/slider.html.twig' %}
     <br>
     <br>
-        <div class="container">
-            <div class="row">
-                {% for product in products %}
+    <div class="container">
+        <div class="row">
+            {% for product in products %}
+                <a href="{{ path('product.show', {id: product.id}) }}">
                     <div class="col-sm">
                         <div class="card" style="width: 18rem;">
                             <img class="card-img-top" src="{{ asset(images_directory ~ '/' ~ 'apple.webp') }}" alt="Card image cap">
@@ -23,8 +24,8 @@
                         </div>
                         <br>
                     </div>
-                 {% endfor %}
-            </div>
+                </a>
+             {% endfor %}
         </div>
-
+    </div>
 {% endblock %}

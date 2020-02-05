@@ -30,21 +30,25 @@ class ProductController extends AbstractController
      */
     public function list()
     {
-        $products = $this->em->getRepository(Product::class)->findAll();
-        return $this->render('product/index.html.twig', [
+        $products = $this->em->getRepository(Product::class)->findAllDesc();
+        return $this->render('product/list.html.twig', [
             'products' => $products,
         ]);
     }
 
     /**
-     * @Route("/show", name="product.show")
+     * @Route("/show/{id}", name = "product.show", requirements = {"id" = "\d+"})
+     *
+     * @param int $id
      *
      * @return Response
      */
-    public function show()
+    public function show(int $id)
     {
-        return $this->render('base.html.twig', [
-//            'products' => $products,
+        $product = $this->em->getRepository(Product::class)->find($id);
+
+        return $this->render('product/show.html.twig', [
+            'product' => $product,
         ]);
     }
 }

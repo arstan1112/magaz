@@ -19,6 +19,11 @@ class AdminProductController extends AbstractController
      */
     private $em;
 
+    /**
+     * AdminProductController constructor.
+     *
+     * @param EntityManagerInterface $em
+     */
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
@@ -42,27 +47,54 @@ class AdminProductController extends AbstractController
      * @param Request $request
      *
      * @return Response
+     *
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function create(Request $request)
     {
         $product = new Product();
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
+//        dump($form->get('pricingPlanName')->getData());
+//        dump($form->get('pricingPlanInterval')->getData());
+//        dump($form->get('pricingPlanAmount')->getData());
+//        dump($form->getData());
 
         if ($form->isSubmitted() && $form->isValid()) {
+//            dump($product);
+//            die();
+
+            \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
+
+            $productApi = \Stripe\Product::create([
+                'name' => $product->getName(),
+                'type' => 'service',
+            ]);
+
+            $plan = \Stripe\Plan::create([
+                'currency' => 'usd',
+                'interval' => $form->get('pricingPlanInterval')->getData(),
+                'product'  => $productApi->id,
+                'nickname' => $form->get('pricingPlanName')->getData(),
+                'amount'   => $form->get('pricingPlanAmount')->getData(),
+            ]);
+
+//            dump($plan);
+//            dump($plan->id);
+//            die();
+
+            $product->setPricingPlanId($plan->id);
+
             $this->em->persist($product);
             $this->em->flush();
 
             return $this->redirectToRoute('admin.products.list');
-//            dump($product);
-//            die();
         }
 
         return $this->render('admin/product/create.html.twig', [
             'form' => $form->createView(),
         ]);
     }
-
 
 //    /**
 //     * @Route("/attribute")

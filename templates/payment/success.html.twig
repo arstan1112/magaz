@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Magaz Payment{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('stripe_subscription_global_style') }}
+    {{ encore_entry_link_tags('stripe_subscription_normalize_style') }}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-4">
+                <a href="{{ path('products.list') }}">
+                    <div>
+                        <img style="max-height: 150px; width: auto;" src="{{ asset(images_directory ~ '/' ~ 'magaz_logo.png') }}" alt="">
+                    </div>
+                </a>
+                <br>
+            </div>
+            <div class="col-sm-8">
+                <br>
+                <br>
+                <h1 style="color: #28a745">Your {{ operation_name }} succeeded!</h1>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('stripe_subscription') }}
+{% endblock %}

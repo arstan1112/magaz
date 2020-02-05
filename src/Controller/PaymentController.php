@@ -26,7 +26,7 @@ class PaymentController extends AbstractController
             'currency' => 'usd',
         ]);
 
-        return $this->render('payment.html.twig', [
+        return $this->render('payment/payment.html.twig', [
             'clientSecret' => $intent->client_secret,
         ]);
     }
@@ -54,60 +54,36 @@ class PaymentController extends AbstractController
         return $this->json($intent);
     }
 
-    /**
-     * @Route("/subscribe", name="subscribe")
-     *
-     * @return Response
-     *
-     */
-    public function subscribe()
-    {
-//        \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
+//    /**
+//     * @Route("/subscribe", name="subscribe")
+//     *
+//     * @return Response
+//     *
+//     */
+//    public function subscribe()
+//    {
 //
-//        $customer = \Stripe\Customer::create([
-//            'payment_method' => 'pm_1FU2bgBF6ERF9jhEQvwnA7sX',
-//            'email' => 'jenny.rosen@example.com',
-//            'invoice_settings' => [
-//                'default_payment_method' => 'pm_1FU2bgBF6ERF9jhEQvwnA7sX'
-//            ]
-//        ]);
-//
-//        $subscription = \Stripe\Subscription::create([
-//            'customer' => 'cus_G02hIo15n8CU1s',
-//            'items' => [
-//                [
-//                    'plan' => 'plan_FSDjyHWis0QVwl',
-//                ],
-//            ],
-//            'expand' => ['latest_invoice.payment_intent'],
-//        ]);
-
-//        return $this->render('payment/subscription.html.twig', [
-//            'subscription' => $subscription,
-//        ]);
-        return $this->render('payment/subscription.html.twig');
-    }
+//        return $this->render('payment/subscription.html.twig');
+//    }
 
     /**
-     * @Route("/create-customer", name="customer.create", methods={"POST"})
+     * @Route("/subscribe", name="subscribe", methods={"POST"})
      *
      * @param Request $request
      *
      * @return JsonResponse
+     *
      * @throws ApiErrorException
+     * @throws \Exception
      */
-    public function createCustomer(Request $request)
+    public function createSubscription(Request $request)
     {
-        // Set your secret key: remember to change this to your live secret key in production
-        // See your keys here: https://dashboard.stripe.com/account/apikeys
         \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
-
         $data = json_decode($request->getContent(), true);
-        dump($data['payment_method']);
-        dump($data['email']);
-        dump($data);
-        die();
-
+//        dump($data['payment_method']);
+//        dump($data['email']);
+//        dump($data);
+//        die();
 
         // This creates a new Customer and attaches the default PaymentMethod in one API call.
         $customer = \Stripe\Customer::create([
@@ -122,14 +98,50 @@ class PaymentController extends AbstractController
             'customer' => $customer,
             'items' => [
                 [
-                    'plan' => 'plan_GfQD3TLBwZx5uQ',
+//                    'plan' => 'plan_GfQD3TLBwZx5uQ',
+                    'plan' => $data['pricing_plan'],
                 ],
             ],
             'expand' => ['latest_invoice.payment_intent'],
         ]);
 
         return $this->json($subscription);
+
     }
+
+    /**
+     * @Route("/success")
+     *
+     * @return Response
+     */
+    public function success()
+    {
+        return $this->render('payment/success.html.twig', [
+            'operation_name' => 'subscription',
+        ]);
+    }
+
+//    /**
+//     * @Route("/create-product")
+//     *
+//     * @throws ApiErrorException
+//     */
+//    public function createProduct()
+//    {
+//        \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
+//        $product = \Stripe\Product::create([
+//            'name' => 'MySoft Platform',
+//            'type' => 'service',
+//        ]);
+//
+//        $plan = \Stripe\Plan::create([
+//            'currency' => 'usd',
+//            'interval' => 'month',
+//            'product' => $product->id,
+//            'nickname' => 'MySoft Pro Plan',
+//            'amount' => 300,
+//        ]);
+//    }
 
     /**
      * @Route("/webhook", name="webhook")
