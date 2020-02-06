@@ -35,7 +35,7 @@ class AdminProductController extends AbstractController
     public function list()
     {
         $products = $this->em->getRepository(Product::class)->findAllDesc();
-        return $this->render('admin/product/index.html.twig', [
+        return $this->render('list.html.twig', [
             'products' => $products,
             'controller_name' => 'AdminProductController',
         ]);

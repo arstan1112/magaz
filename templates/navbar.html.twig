@@ -15,44 +15,51 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ path('payment') }}">Payments</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ path('subscribe') }}">Subscribe</a>
-            </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Dropdown
+                    Sign in
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Action</a>
-                    <a class="dropdown-item" href="#">Another action</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Something else here</a>
+                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                        <a class="nav-link" href="{{ path('app_logout') }}">Sign out</a>
+                    {% else %}
+                        <a class="nav-link" href="{{ path('app_login') }}">Sign in</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="nav-link" href="{{ path('app_register') }}">Sign up</a>
+                    {% endif %}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <div class="dropdown-divider"></div>
+                        <a class="nav-link" href="{{ path('admin.products.list') }}">Admin Panel</a>
+                    {% endif %}
                 </div>
             </li>
-            <li class="nav-item">
-                <a class="nav-link disabled" href="#">Disabled</a>
-            </li>
-            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_logout') }}">Sign out</a>
-                </li>
-            {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_login') }}">Sign in</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_register') }}">Sign up</a>
-                </li>
-            {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ path('admin.products.list') }}">Admin Panel</a>
                 </li>
             {% endif %}
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
+        <div class="float-right">
+            <div class="container">
+                <div class="row">
+                    <div class="sol-sm">
+                        <form class="form-inline my-2 my-lg-0">
+                            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                        </form>
+                    </div>
+                    <div class="sol-sm">
+                        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                            <a class="nav-link disabled" href="#">Logged in as <i><strong>{{ app.user.username }}</strong></i></a>
+                        {% endif %}
+                    </div>
+                    <div class="sol-sm">
+                        <a href="{{ path('products.list') }}">
+                            <img style="max-width: 40px; max-height: 40px; margin-left: 15px; margin-right: 20px" src="{{ asset(images_directory ~ '/' ~ 'magaz_logo.png') }}" alt="">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </nav>

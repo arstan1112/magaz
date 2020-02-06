@@ -28,9 +28,27 @@
                 </li>
             {% endif %}
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
+        <div class="float-right">
+            <div class="container">
+                <div class="row">
+                    <div class="sol-sm">
+                        <form class="form-inline my-2 my-lg-0">
+                            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                        </form>
+                    </div>
+                    <div class="sol-sm">
+                        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                            <a class="nav-link disabled" href="#">Logged in as <i><strong>{{ app.user.username }}</strong></i></a>
+                        {% endif %}
+                    </div>
+                    <div class="sol-sm">
+                        <a href="{{ path('products.list') }}">
+                            <img style="max-width: 40px; max-height: 40px; margin-left: 15px; margin-right: 20px" src="{{ asset(images_directory ~ '/' ~ 'magaz_logo.png') }}" alt="">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </nav>

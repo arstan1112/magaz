@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Subscription;
+use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Event;
 use Stripe\Exception\ApiErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,6 +14,16 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PaymentController extends AbstractController
 {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
+
     /**
      * @Route("/payment", name="payment")
      *
@@ -80,10 +92,6 @@ class PaymentController extends AbstractController
     {
         \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
         $data = json_decode($request->getContent(), true);
-//        dump($data['payment_method']);
-//        dump($data['email']);
-//        dump($data);
-//        die();
 
         // This creates a new Customer and attaches the default PaymentMethod in one API call.
         $customer = \Stripe\Customer::create([
@@ -105,8 +113,20 @@ class PaymentController extends AbstractController
             'expand' => ['latest_invoice.payment_intent'],
         ]);
 
-        return $this->json($subscription);
+        $new_subscription = new Subscription();
+        $new_subscription->setStripeId($subscription->id);
+        $new_subscription->setCurrentPeriodEndAt(new \DateTime(strtotime($subscription->current_period_end)));
+        $new_subscription->setCurrentPeriodStartAt(new \DateTime(strtotime($subscription->current_period_start)));
+        $new_subscription->setNickname($subscription->plan->nickname);
+        $new_subscription->setRegularity($subscription->plan->interval);
 
+        $this->em->persist($new_subscription);
+        $this->em->flush();
+//        dump($new_subscription);
+//        die();
+
+//        return $this->json($subscription);
+        return $this->json($new_subscription);
     }
 
     /**
