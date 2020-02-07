@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Subscription;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\This;
 use Stripe\Event;
 use Stripe\Exception\ApiErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,6 +13,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class PaymentController extends AbstractController
 {
@@ -66,102 +71,7 @@ class PaymentController extends AbstractController
         return $this->json($intent);
     }
 
-//    /**
-//     * @Route("/subscribe", name="subscribe")
-//     *
-//     * @return Response
-//     *
-//     */
-//    public function subscribe()
-//    {
-//
-//        return $this->render('payment/subscription.html.twig');
-//    }
 
-    /**
-     * @Route("/subscribe", name="subscribe", methods={"POST"})
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     *
-     * @throws ApiErrorException
-     * @throws \Exception
-     */
-    public function createSubscription(Request $request)
-    {
-        \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
-        $data = json_decode($request->getContent(), true);
-
-        // This creates a new Customer and attaches the default PaymentMethod in one API call.
-        $customer = \Stripe\Customer::create([
-            'payment_method' => $data['payment_method'],
-            'email' => $data['email'],
-            'invoice_settings' => [
-                'default_payment_method' => $data['payment_method']
-            ]
-        ]);
-
-        $subscription = \Stripe\Subscription::create([
-            'customer' => $customer,
-            'items' => [
-                [
-//                    'plan' => 'plan_GfQD3TLBwZx5uQ',
-                    'plan' => $data['pricing_plan'],
-                ],
-            ],
-            'expand' => ['latest_invoice.payment_intent'],
-        ]);
-
-        $new_subscription = new Subscription();
-        $new_subscription->setStripeId($subscription->id);
-        $new_subscription->setCurrentPeriodEndAt(new \DateTime(strtotime($subscription->current_period_end)));
-        $new_subscription->setCurrentPeriodStartAt(new \DateTime(strtotime($subscription->current_period_start)));
-        $new_subscription->setNickname($subscription->plan->nickname);
-        $new_subscription->setRegularity($subscription->plan->interval);
-
-        $this->em->persist($new_subscription);
-        $this->em->flush();
-//        dump($new_subscription);
-//        die();
-
-//        return $this->json($subscription);
-        return $this->json($new_subscription);
-    }
-
-    /**
-     * @Route("/success")
-     *
-     * @return Response
-     */
-    public function success()
-    {
-        return $this->render('payment/success.html.twig', [
-            'operation_name' => 'subscription',
-        ]);
-    }
-
-//    /**
-//     * @Route("/create-product")
-//     *
-//     * @throws ApiErrorException
-//     */
-//    public function createProduct()
-//    {
-//        \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
-//        $product = \Stripe\Product::create([
-//            'name' => 'MySoft Platform',
-//            'type' => 'service',
-//        ]);
-//
-//        $plan = \Stripe\Plan::create([
-//            'currency' => 'usd',
-//            'interval' => 'month',
-//            'product' => $product->id,
-//            'nickname' => 'MySoft Pro Plan',
-//            'amount' => 300,
-//        ]);
-//    }
 
     /**
      * @Route("/webhook", name="webhook")

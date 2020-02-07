@@ -35,7 +35,12 @@ class AdminSubscriptionController extends AbstractController
      */
     public function list()
     {
-        $subscriptions = $this->em->getRepository(Subscription::class)->findAll();
+        $user = $this->em->getRepository(User::class)->find($this->getUser()->getId());
+
+//        dump($this->getUser());
+//        die();
+
+        $subscriptions = $this->em->getRepository(Subscription::class)->findWithUserId($this->getUser()->getId());
         return $this->render('admin/subscription/list.html.twig', [
             'subscriptions' => $subscriptions,
         ]);

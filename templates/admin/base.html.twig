@@ -19,11 +19,16 @@
             <div class="row">
                 <div class="col-md-2">
                     <ul>
-                        <li><a href="{{ path('admin.categories.list') }}">Categories</a></li>
-                        <li><a href="{{ path('admin.products.list') }}">Products</a></li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li><a href="{{ path('admin.categories.list') }}">Categories</a></li>
+                            <li><a href="{{ path('admin.products.list') }}">Products</a></li>
+                        {% endif %}
                         {% if is_granted('ROLE_SUPER_ADMIN') %}
                             <li><a href="{{ path('admin.users.list') }}">Users</a></li>
                         {% elseif is_granted('ROLE_ADMIN') %}
+                            <li><a href="{{ path('admin.subscriptions.list') }}">Subscriptions</a></li>
+                        {% endif %}
+                        {% if is_granted('ROLE_CUSTOMER') %}
                             <li><a href="{{ path('admin.subscriptions.list') }}">Subscriptions</a></li>
                         {% endif %}
                     </ul>

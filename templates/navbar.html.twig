@@ -27,7 +27,7 @@
                         <div class="dropdown-divider"></div>
                         <a class="nav-link" href="{{ path('app_register') }}">Sign up</a>
                     {% endif %}
-                    {% if is_granted('ROLE_ADMIN') %}
+                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_CUSTOMER') %}
                         <div class="dropdown-divider"></div>
                         <a class="nav-link" href="{{ path('admin.products.list') }}">Admin Panel</a>
                     {% endif %}

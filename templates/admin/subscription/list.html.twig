@@ -12,11 +12,13 @@
     {% for subscription in subscriptions %}
         <ul class="list-group">
             <li class="list-group-item list-group-item-light">
-                <div class="float-left">Subsciption name: <strong>{{ subscription.nickname }}</strong></div>
+                <div class="float-left">Name: <strong>{{ subscription.nickname }}</strong></div>
                 <br>
                 <div class="float-left">Interval: every <strong>{{ subscription.regularity }}</strong></div>
+                <br>
+                <div class="float-left">Amount: <strong>{{ subscription.amount }} USD</strong></div>
                 <div class="float-right">
-                    <a href="#"><button class="btn btn-danger">Cancel</button></a>
+                    <a href="{{ path('subscription.cancel', {subscriptionId: subscription.stripeId}) }}"><button class="btn btn-danger">Cancel</button></a>
                 </div>
             </li>
         </ul>

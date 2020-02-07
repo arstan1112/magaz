@@ -35,7 +35,7 @@ class AdminProductController extends AbstractController
     public function list()
     {
         $products = $this->em->getRepository(Product::class)->findAllDesc();
-        return $this->render('list.html.twig', [
+        return $this->render('admin/product/list.html.twig', [
             'products' => $products,
             'controller_name' => 'AdminProductController',
         ]);
@@ -55,14 +55,8 @@ class AdminProductController extends AbstractController
         $product = new Product();
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
-//        dump($form->get('pricingPlanName')->getData());
-//        dump($form->get('pricingPlanInterval')->getData());
-//        dump($form->get('pricingPlanAmount')->getData());
-//        dump($form->getData());
 
         if ($form->isSubmitted() && $form->isValid()) {
-//            dump($product);
-//            die();
 
             \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
 
@@ -78,10 +72,6 @@ class AdminProductController extends AbstractController
                 'nickname' => $form->get('pricingPlanName')->getData(),
                 'amount'   => $form->get('pricingPlanAmount')->getData(),
             ]);
-
-//            dump($plan);
-//            dump($plan->id);
-//            die();
 
             $product->setPricingPlanId($plan->id);
 

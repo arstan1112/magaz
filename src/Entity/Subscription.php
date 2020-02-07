@@ -49,9 +49,15 @@ class Subscription
     private $regularity;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="subscriptions")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $stripeCustomerId;
+    private $customer;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $amount;
 
     public function __construct()
     {
@@ -154,14 +160,26 @@ class Subscription
         return $this;
     }
 
-    public function getStripeCustomerId(): ?string
+    public function getCustomer(): ?User
     {
-        return $this->stripeCustomerId;
+        return $this->customer;
     }
 
-    public function setStripeCustomerId(string $stripeCustomerId): self
+    public function setCustomer(?User $customer): self
     {
-        $this->stripeCustomerId = $stripeCustomerId;
+        $this->customer = $customer;
+
+        return $this;
+    }
+
+    public function getAmount(): ?int
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(int $amount): self
+    {
+        $this->amount = $amount;
 
         return $this;
     }
