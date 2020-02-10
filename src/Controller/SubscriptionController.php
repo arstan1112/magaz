@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Subscription;
+use App\Stripe\PaymentGateway;
 use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Exception\ApiErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,9 +21,15 @@ class SubscriptionController extends AbstractController
      */
     private $em;
 
-    public function __construct(EntityManagerInterface $em)
+    /**
+     * @var PaymentGateway
+     */
+    private $gateway;
+
+    public function __construct(EntityManagerInterface $em, PaymentGateway $gateway)
     {
-        $this->em = $em;
+        $this->em      = $em;
+        $this->gateway = $gateway;
     }
 
     /**
@@ -37,7 +44,6 @@ class SubscriptionController extends AbstractController
      */
     public function subscribe(Request $request)
     {
-
         \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
         $data = json_decode($request->getContent(), true);
 
@@ -86,32 +92,11 @@ class SubscriptionController extends AbstractController
      *
      * @return Response
      */
-    public function show()
+    public function success()
     {
-        return $this->render('payment/success.html.twig', [
+        return $this->render('subscription/success.html.twig', [
             'operation_name' => 'subscription',
         ]);
     }
 
-    /**
-     * @Route("/subscription/cancel/{subscriptionId}", name="subscription.cancel", methods={"GET", "POST"})
-     *
-     * @param $subscriptionId
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     * @throws ApiErrorException
-     */
-    public function cancel($subscriptionId)
-    {
-//        $subscriptionId;
-        \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
-
-        $subscription = \Stripe\Subscription::retrieve(
-//            'sub_GgXeY3AXhwsKSA'
-            $subscriptionId
-        );
-        $subscription->delete();
-
-        return $this->json($subscription);
-    }
 }

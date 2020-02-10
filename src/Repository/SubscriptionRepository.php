@@ -19,12 +19,34 @@ class SubscriptionRepository extends ServiceEntityRepository
         parent::__construct($registry, Subscription::class);
     }
 
+    public function save(Subscription $subscription)
+    {
+        $this->_em->persist($subscription);
+        $this->_em->flush();
+    }
+
+    public function remove(Subscription $subscription)
+    {
+        $this->_em->remove($subscription);
+        $this->_em->flush();
+    }
+
     public function findWithUserId($id)
     {
         return $this->createQueryBuilder('s')
             ->innerJoin('s.customer', 'user')
             ->where('user.id = :id')
             ->setParameter('id', $id)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+    public function findWithStripeId($stripeId)
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.stripeId = :stripeId')
+            ->setParameter('stripeId', $stripeId)
             ->getQuery()
             ->getResult()
             ;

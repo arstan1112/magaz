@@ -26,6 +26,7 @@ Encore
     .addEntry('app', './assets/js/app.js')
     .addEntry('stripe_payment', './assets/js/stripe_payment.js')
     .addEntry('stripe_subscription', './assets/js/stripe_subscription.js')
+    .addEntry('stripe_subscription_cancel', './assets/js/stripe_subscription_cancel.js')
     .addStyleEntry('stripe_payment_style', './assets/css/stripe_payment.css')
     .addStyleEntry('stripe_subscription_global_style', './assets/css/stripe_subscription_global.css')
     .addStyleEntry('stripe_subscription_normalize_style', './assets/css/stripe_subscription_normalize.css')

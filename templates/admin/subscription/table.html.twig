@@ -1,0 +1,18 @@
+{% for subscription in subscriptions %}
+    <ul class="list-group subscriptionList">
+        <li class="list-group-item list-group-item-light">
+            <div class="float-left">Name: <strong>{{ subscription.nickname }}</strong></div>
+            <br>
+            <div class="float-left">Interval: every <strong>{{ subscription.regularity }}</strong></div>
+            <br>
+            <div class="float-left">Amount: <strong>{{ subscription.amount }} USD</strong></div>
+            <div class="float-right">
+{#                <a id="cancel" href="{{ path('subscription.cancel', {subscriptionId: subscription.stripeId}) }}"><button class="btn btn-danger">Cancel</button></a>#}
+                <button id="cancelSubscriptionButton" class="btn btn-danger cancelSubscriptionButton">Cancel</button>
+
+{#                <a href="{{ path('users.cancel', {id: subscription.id}) }}" class="btn btn-sm btn-outline-danger cancel">Cancel</a>#}
+            </div>
+            <input type="hidden" id="subscriptionId" class="subscriptionId" value="{{ subscription.stripeId }}">
+        </li>
+    </ul>
+{% endfor %}

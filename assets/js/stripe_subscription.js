@@ -6,7 +6,6 @@ var elements = stripe.elements();
 
 console.log('customlog: stripe_subscription start');
 
-
 // Client.js
 // Set up Stripe.js and Elements to use in checkout form
 var style = {
@@ -68,7 +67,6 @@ form.addEventListener('submit', function(event) {
     }
 });
 
-
 // Script.js
 function stripePaymentMethodHandler(result, email) {
     var customerEmail = document.getElementById('email').value;
@@ -100,6 +98,41 @@ function stripePaymentMethodHandler(result, email) {
         });
     }
 }
+
+// $('.cancel').on('click', function () {
+//     let link = $(this).attr('href');
+// });
+
+// var cancelSubscription = document.getElementById('cancelSubscription');
+// var subscriptionId = document.getElementById('subscriptionId').value;
+// cancelSubscription.on('click', function (e) {
+//     console.log('cancelSubscription button pressed');
+//     $.post('/subscription/cancel/'+subscriptionId)
+//         .then(function (response) {
+//             $('.subscriptionList').prepend(response['content']);
+//             console.log('Subscription cancel succeeded');
+//         })
+//         .fail(function (xhr) {
+//             let response = JSON.parse(xhr.responseText);
+//             alert(response);
+//         })
+//     ;
+// });
+
+
+// cancelSubscription.addEventListener('click', function (event) {
+//     console.log('cancelSubscription button pressed');
+//     $.post('/subscription/cancel/'+subscriptionId)
+//         .then(function (response) {
+//             $('.subscriptionList').prepend(response['content']);
+//             console.log('Subscription cancel succeeded');
+//         })
+//         .fail(function (xhr) {
+//             let response = JSON.parse(xhr.responseText);
+//             alert(response);
+//         })
+//     ;
+// });
 
 // Client.js
 // var subscription = document.getElementById('subscription').value;
