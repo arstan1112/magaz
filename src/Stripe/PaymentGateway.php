@@ -3,7 +3,7 @@
 
 namespace App\Stripe;
 
-use Stripe\{Stripe, Subscription};
+use Stripe\{PaymentIntent, Stripe, Subscription, Customer};
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PaymentGateway
@@ -23,17 +23,15 @@ class PaymentGateway
     public function cancel($subscriptionId)
     {
         $subscription = Subscription::retrieve($subscriptionId);
+//        $subscription->delete();
 
-        $subscription->delete();
+        return $subscription;
     }
 
     public function subscribe($data)
     {
-//        \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
-//        $data = json_decode($request->getContent(), true);
-
         // This creates a new Customer and attaches the default PaymentMethod in one API call.
-        $customer = \Stripe\Customer::create([
+        $customer = Customer::create([
             'payment_method' => $data['payment_method'],
             'email' => $data['email'],
             'invoice_settings' => [
@@ -41,5 +39,27 @@ class PaymentGateway
             ]
         ]);
 
+        $subscription = Subscription::create([
+            'customer' => $customer,
+            'items' => [
+                [
+                    'plan' => $data['pricing_plan'],
+                ],
+            ],
+            'expand' => ['latest_invoice.payment_intent'],
+        ]);
+
+        return $subscription;
     }
+
+    public function pay()
+    {
+        $intent = PaymentIntent::create([
+            'amount'   => 1055,
+            'currency' => 'usd',
+        ]);
+
+        return $intent;
+    }
+
 }

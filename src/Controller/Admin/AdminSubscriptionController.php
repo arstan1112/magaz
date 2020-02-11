@@ -44,13 +44,10 @@ class AdminSubscriptionController extends AbstractController
      */
     public function list()
     {
-//        $user = $this->em->getRepository(User::class)->find($this->getUser()->getId());
-//        dump($this->getUser());
-//        die();
-
-        $subscriptions = $this->subscriptions->findBy([
-            'customer' => $this->getUser(),
-        ]);
+//        $subscriptions = $this->subscriptions->findBy([
+//            'customer' => $this->getUser(),
+//        ], ['currentPeriodStartAt' => 'DESC']);
+        $subscriptions = $this->subscriptions->findActiveByUserId($this->getUser());
 
         return $this->render('admin/subscription/list.html.twig', [
             'subscriptions' => $subscriptions,
@@ -58,7 +55,11 @@ class AdminSubscriptionController extends AbstractController
     }
 
     /**
-     * @Route("/subscriptions/{id}/cancel", name="users.cancel", methods={"POST"})
+     * @Route("/subscriptions/{id}/cancel", name="subsciption.user.cancel", methods={"POST"})
+     *
+     * @param Subscription $subscription
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function cancel2(Subscription $subscription)
     {
@@ -66,9 +67,7 @@ class AdminSubscriptionController extends AbstractController
 
         try {
             $this->gateway->cancel($id);
-
-            // $subscription->setStatus('pending');
-
+            $subscription->setStatus('pending');
             $this->subscriptions->save($subscription);
         } catch (\Exception $e) {
 //            $this->logger->error($e->getMessage());
@@ -85,47 +84,22 @@ class AdminSubscriptionController extends AbstractController
      *
      * @return JsonResponse|Response
      *
-     * @throws ApiErrorException
      */
     public function cancel(Request $request)
     {
-//        $subscriptionId;
-//        \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
-
         $data = json_decode($request->getContent(), true);
-
         $subscription = $this->gateway->cancel($data['subscriptionId']);
 
-        // Subscription
-        // status: active, pending, cancelled
-
-//        $subscription = \Stripe\Subscription::retrieve(
-//            $data['subscriptionId']
-//        );
-//        $subscription->delete();
-
-//        $subscriptionInDB = $this->em->getRepository(Subscription::class)->findWithStripeId($subscription->id);
-
-        $subscriptionInDB = $this->subscriptions->find($subscription->id);
-
-//        dump($subscriptionInDB[0]);
-//        die();
-//        $this->em->remove($subscriptionInDB[0]);
-//        $this->em->flush();
-
-//        $subscriptions = $this->em->getRepository(Subscription::class)->findWithUserId($this->getUser()->getId());
-
-        $rendered = $this->renderView('admin/subscription/table.html.twig', [
-           'subscriptions' => $subscriptions,
+        $subscriptionInDB = $this->subscriptions->findOneBy([
+            'stripeId' => $subscription->id,
         ]);
+
+        $subscriptionInDB->setStatus('pending');
+        $this->subscriptions->save($subscriptionInDB);
 
         return $this->json([
-           'content' => $rendered,
+           'content' => '$rendered',
         ]);
 
-//        return $this->render('admin/subscription/list.html.twig', [
-//            'subscriptions' => $subscriptions,
-//        ]);
-//        return $this->json($subscription);
     }
 }

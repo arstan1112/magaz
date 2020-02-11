@@ -31,22 +31,14 @@ class SubscriptionRepository extends ServiceEntityRepository
         $this->_em->flush();
     }
 
-    public function findWithUserId($id)
+    public function findActiveByUserId($userId)
     {
         return $this->createQueryBuilder('s')
-            ->innerJoin('s.customer', 'user')
-            ->where('user.id = :id')
-            ->setParameter('id', $id)
-            ->getQuery()
-            ->getResult()
-            ;
-    }
-
-    public function findWithStripeId($stripeId)
-    {
-        return $this->createQueryBuilder('s')
-            ->where('s.stripeId = :stripeId')
-            ->setParameter('stripeId', $stripeId)
+            ->where('s.customer = :userId')
+            ->andWhere('s.status = :active')
+            ->setParameter('userId', $userId)
+            ->setParameter('active', 'active')
+            ->orderBy('s.currentPeriodStartAt', 'DESC')
             ->getQuery()
             ->getResult()
             ;

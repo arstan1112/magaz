@@ -7,10 +7,12 @@ use App\Stripe\PaymentGateway;
 use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Exception\ApiErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -37,34 +39,16 @@ class SubscriptionController extends AbstractController
      *
      * @param Request $request
      *
-     * @return string
-     * @throws ApiErrorException
+     * @return JsonResponse
+     *
      * @throws \Exception
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function subscribe(Request $request)
     {
-        \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
         $data = json_decode($request->getContent(), true);
 
-        // This creates a new Customer and attaches the default PaymentMethod in one API call.
-        $customer = \Stripe\Customer::create([
-            'payment_method' => $data['payment_method'],
-            'email' => $data['email'],
-            'invoice_settings' => [
-                'default_payment_method' => $data['payment_method']
-            ]
-        ]);
-
-        $subscription = \Stripe\Subscription::create([
-            'customer' => $customer,
-            'items' => [
-                [
-                    'plan' => $data['pricing_plan'],
-                ],
-            ],
-            'expand' => ['latest_invoice.payment_intent'],
-        ]);
+        $subscription = $this->gateway->subscribe($data);
 
         $new_subscription = new Subscription();
         $new_subscription->setStripeId($subscription->id);
@@ -73,6 +57,7 @@ class SubscriptionController extends AbstractController
         $new_subscription->setNickname($subscription->plan->nickname);
         $new_subscription->setRegularity($subscription->plan->interval);
         $new_subscription->setAmount(($subscription->plan->amount)/100);
+        $new_subscription->setStatus('active');
         $new_subscription->setCustomer($this->getUser());
 
         $this->em->persist($new_subscription);

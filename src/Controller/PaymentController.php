@@ -2,13 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\Subscription;
-use App\Entity\User;
+use App\Stripe\PaymentGateway;
 use Doctrine\ORM\EntityManagerInterface;
-use phpDocumentor\Reflection\Types\This;
-use Stripe\Event;
-use Stripe\Exception\ApiErrorException;
+use Stripe\{Exception\SignatureVerificationException, Stripe, PaymentIntent};
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,54 +22,29 @@ class PaymentController extends AbstractController
      */
     private $em;
 
-    public function __construct(EntityManagerInterface $em)
+    /**
+     * @var PaymentGateway
+     */
+    private $gateway;
+
+    public function __construct(EntityManagerInterface $em, PaymentGateway $gateway)
     {
-        $this->em = $em;
+        $this->em      = $em;
+        $this->gateway = $gateway;
     }
 
     /**
      * @Route("/payment", name="payment")
      *
-     * @throws ApiErrorException
      */
     public function show()
     {
-        \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
-
-        $intent = \Stripe\PaymentIntent::create([
-            'amount'   => 1055,
-            'currency' => 'usd',
-        ]);
+        $intent = $this->gateway->pay();
 
         return $this->render('payment/payment.html.twig', [
             'clientSecret' => $intent->client_secret,
         ]);
     }
-
-    /**
-     * @Route("/charge/{value}", name="charge")
-     *
-     * @param Request $request
-     * @param int $value
-     *
-     * @return JsonResponse
-     *
-     * @throws ApiErrorException
-     */
-    public function charge(Request $request, int $value)
-    {
-        \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
-        $data = $request->getContent();
-
-        $intent = \Stripe\PaymentIntent::create([
-            'amount'   => 1055,
-            'currency' => 'usd',
-        ]);
-
-        return $this->json($intent);
-    }
-
-
 
     /**
      * @Route("/webhook", name="webhook")
@@ -80,9 +53,9 @@ class PaymentController extends AbstractController
      */
     public function hook(Request $request)
     {
-        \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
+        Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
 
-        $endpoint_secret = 'whsec_NjDvwBC3LRE6ek0R4ph9heXM4yKrojZa';
+        $endpoint_secret = 'whsec_AuV9eacljG8Cztg2KvGrvzeYGEsM9uEa';
 
         $payload = @file_get_contents('php://input');
         $sig_header = $request->server->get('HTTP_STRIPE_SIGNATURE');
@@ -97,11 +70,10 @@ class PaymentController extends AbstractController
         } catch (\UnexpectedValueException $e) {
 //            http_response_code(400);
             http_response_code(401);
-
             exit();
         } catch (\Stripe\Exception\SignatureVerificationException $e) {
 //            http_response_code(400);
-            http_response_code(402);
+            http_response_code(410);
             exit();
         }
 
@@ -114,6 +86,18 @@ class PaymentController extends AbstractController
             case 'payment_method.attached':
                 $paymentMethod = $event->data->object;
                 $this->handlePaymentMethodAttached($paymentMethod);
+                break;
+
+            case 'payment_intent.created':
+                $this->handlePaymentIntentCreated();
+                break;
+
+            case 'customer.created':
+                $this->handleCustomerCreated();
+                break;
+
+            case 'customer.subscription.created':
+                $this->handleCustomerSubscriptionCreated();
                 break;
 
             default:
@@ -141,6 +125,24 @@ class PaymentController extends AbstractController
     public function handlePaymentMethodAttached(object $paymentMethod)
     {
         http_response_code(202);
+        exit();
+    }
+
+    public function handlePaymentIntentCreated()
+    {
+        http_response_code(203);
+        exit();
+    }
+
+    public function handleCustomerCreated()
+    {
+        http_response_code(204);
+        exit();
+    }
+
+    public function handleCustomerSubscriptionCreated()
+    {
+        http_response_code(205);
         exit();
     }
 }
