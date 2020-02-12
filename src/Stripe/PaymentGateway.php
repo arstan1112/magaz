@@ -23,7 +23,7 @@ class PaymentGateway
     public function cancel($subscriptionId)
     {
         $subscription = Subscription::retrieve($subscriptionId);
-//        $subscription->delete();
+        $subscription->delete();
 
         return $subscription;
     }

@@ -4,8 +4,6 @@
 var stripe = Stripe('pk_test_zqRoDviJgLasWIWTaF24r7sX008b6oRSq4');
 var elements = stripe.elements();
 
-console.log('customlog: stripe_subscription start');
-
 // Client.js
 // Set up Stripe.js and Elements to use in checkout form
 var style = {
@@ -30,8 +28,6 @@ var style = {
 var cardElement = elements.create("card", { style: style });
 cardElement.mount("#card-element");
 
-console.log('customlog: stripe_subscription card created');
-
 // Javascript
 // card.addEventListener('change', ({error}) => {
 cardElement.addEventListener('change', ({error}) => {
@@ -43,8 +39,6 @@ cardElement.addEventListener('change', ({error}) => {
     }
 });
 
-console.log('customlog: stripe_subscription after event listener');
-
 //Client.js
 var form = document.getElementById('subscription-form');
 
@@ -52,7 +46,6 @@ form.addEventListener('submit', function(event) {
     // We don't want to let default form submission happen here,
     // which would refresh the page.
     event.preventDefault();
-    console.log('customlog: subscribe button pressed');
     var pricingPlan   = document.getElementById('pricingPlan').value;
     if (!pricingPlan) {
         alert('No pricing plan found. Can\'t subscribe');
@@ -71,8 +64,6 @@ form.addEventListener('submit', function(event) {
 function stripePaymentMethodHandler(result, email) {
     var customerEmail = document.getElementById('email').value;
     var pricingPlan   = document.getElementById('pricingPlan').value;
-    console.log('customerEmail');
-    console.log(customerEmail);
     if (result.error) {
         console.log(result.error);
         // Show error in payment form
@@ -91,11 +82,21 @@ function stripePaymentMethodHandler(result, email) {
             }),
         }).then(function(result) {
             return result.json();
-        }).then(function(customer) {
-            console.log('customlog: customer created');
+        }).then(function(responseJson) {
+            console.log(responseJson);
+            let failure = responseJson['status'];
+            if (failure === 'error') {
+                console.log('failure');
+            } else {
+                console.log('success');
+            }
             // The customer has been created
-            window.location.href = '/success';
+            // window.location.href = '/success';
+        }).catch(function (error) {
+            console.log(error);
+            // window.location.href = '/failure/'+error;
         });
+        // window.location.href = '/success';
     }
 }
 

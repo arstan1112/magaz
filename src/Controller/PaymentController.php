@@ -35,7 +35,6 @@ class PaymentController extends AbstractController
 
     /**
      * @Route("/payment", name="payment")
-     *
      */
     public function show()
     {

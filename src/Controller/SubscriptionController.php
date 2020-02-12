@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Subscription;
 use App\Stripe\PaymentGateway;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Stripe\Exception\ApiErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,10 +29,16 @@ class SubscriptionController extends AbstractController
      */
     private $gateway;
 
-    public function __construct(EntityManagerInterface $em, PaymentGateway $gateway)
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(EntityManagerInterface $em, PaymentGateway $gateway, LoggerInterface $stripeLogger)
     {
         $this->em      = $em;
         $this->gateway = $gateway;
+        $this->logger  = $stripeLogger;
     }
 
     /**
@@ -39,7 +46,7 @@ class SubscriptionController extends AbstractController
      *
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return string
      *
      * @throws \Exception
      * @throws ExceptionInterface
@@ -48,7 +55,25 @@ class SubscriptionController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $subscription = $this->gateway->subscribe($data);
+        try {
+            $this->logger->info('Stripe subscription for user ' .$this->getUser()->getUsername(). ' initiated');
+//            $this->logger->info('Stripe subscription for user User initiated');
+            $subscription = $this->gateway->subscribe($data);
+//            $this->logger->info('Stripe subscription for user ' .$this->getUser(). 'initiated');
+            $this->logger->info('Stripe subscription for user User initiation succeeded');
+        } catch (\Exception $e) {
+            $this->logger->warning(
+                'Stripe subscription initialization for user '
+                .$this->getUser()->getUsername().
+                'failed with Exception'. $e->getMessage()
+//            'Stripe subscription initialization for user User failed with exception Exception'
+            );
+//            throw new \Exception('Stripe subsciption failed with message: ' .$e->getMessage());
+            return $this->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
 
         $new_subscription = new Subscription();
         $new_subscription->setStripeId($subscription->id);
@@ -67,9 +92,9 @@ class SubscriptionController extends AbstractController
         $encoder    = new JsonEncoder();
         $serializer = new Serializer([$normalizer], [$encoder]);
 
-        $serialized_subscription = $serializer->serialize($new_subscription, 'json', ['ignored_attributes' => ['customer']]);
+        $serializedNewSubscriptionObject = $serializer->serialize($new_subscription, 'json', ['ignored_attributes' => ['customer']]);
 
-        return $this->json($serializer->decode($serialized_subscription, 'json'));
+        return $this->json($serializer->decode($serializedNewSubscriptionObject, 'json'));
     }
 
     /**
@@ -81,6 +106,21 @@ class SubscriptionController extends AbstractController
     {
         return $this->render('subscription/success.html.twig', [
             'operation_name' => 'subscription',
+        ]);
+    }
+
+    /**
+     * @Route("/failure/{message}")
+     *
+     * @param string $message
+     *
+     * @return Response
+     */
+    public function failure(string $message)
+    {
+        return $this->render('subscription/failure.html.twig', [
+            'operation_name' => 'subscription',
+            'message' => $message,
         ]);
     }
 
