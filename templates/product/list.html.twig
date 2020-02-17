@@ -8,13 +8,13 @@
     <br>
     <br>
     <div class="container">
-        <div class="row">
-            {% for product in products %}
-                <a href="{{ path('product.show', {id: product.id}) }}">
+        {% for product in products %}
+            <div class="row justify-content-center align-items-center">
+                <a href="{{ path('product.show', {id: product.id}) }}"  style="color: #28a745">
                     <div class="col-sm">
                         <div class="card" style="width: 18rem;">
-                            <img class="card-img-top" src="{{ asset(images_directory ~ '/' ~ 'apple.webp') }}" alt="Card image cap">
                             <div class="card-body">
+                                <h3>Standard</h3>
                                 <h5 class="card-title">{{ product.name }}</h5>
                                 <p class="card-text">{{ product.description }}</p>
                                 <i>
@@ -25,7 +25,37 @@
                         <br>
                     </div>
                 </a>
-             {% endfor %}
-        </div>
+                <a href="{{ path('product.show', {id: product.id}) }}"  style="color: #916319">
+                    <div class="col-sm">
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h3>Premium</h3>
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <p class="card-text">{{ product.description }}</p>
+                                <i>
+                                    <a href="#">{{ product.category.name }}</a>
+                                </i>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                </a>
+                <a href="{{ path('product.show', {id: product.id}) }}"  style="color: #916319">
+                    <div class="col-sm">
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h3>Pro+</h3>
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <p class="card-text">{{ product.description }}</p>
+                                <i>
+                                    <a href="#">{{ product.category.name }}</a>
+                                </i>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                </a>
+            </div>
+         {% endfor %}
     </div>
 {% endblock %}

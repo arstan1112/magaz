@@ -57,16 +57,13 @@ class SubscriptionController extends AbstractController
 
         try {
             $this->logger->info('Stripe subscription for user ' .$this->getUser()->getUsername(). ' initiated');
-//            $this->logger->info('Stripe subscription for user User initiated');
             $subscription = $this->gateway->subscribe($data);
-//            $this->logger->info('Stripe subscription for user ' .$this->getUser(). 'initiated');
-            $this->logger->info('Stripe subscription for user User initiation succeeded');
+            $this->logger->info('Stripe subscription for user ' .$this->getUser()->getUsername(). ' initiation succeeded');
         } catch (\Exception $e) {
             $this->logger->warning(
                 'Stripe subscription initialization for user '
                 .$this->getUser()->getUsername().
-                'failed with Exception'. $e->getMessage()
-//            'Stripe subscription initialization for user User failed with exception Exception'
+                ' failed with Exception: '. $e->getMessage()
             );
 //            throw new \Exception('Stripe subsciption failed with message: ' .$e->getMessage());
             return $this->json([
@@ -123,5 +120,4 @@ class SubscriptionController extends AbstractController
             'message' => $message,
         ]);
     }
-
 }

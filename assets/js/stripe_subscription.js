@@ -96,7 +96,7 @@ function stripePaymentMethodHandler(result, email) {
             console.log(error);
             // window.location.href = '/failure/'+error;
         });
-        // window.location.href = '/success';
+        window.location.href = '/success';
     }
 }
 
