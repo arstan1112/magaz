@@ -84,11 +84,14 @@ function stripePaymentMethodHandler(result, email) {
             return result.json();
         }).then(function(responseJson) {
             console.log(responseJson);
-            let failure = responseJson['status'];
-            if (failure === 'error') {
+            let status = responseJson['status'];
+            if (status === 'error') {
                 console.log('failure');
+                let message = responseJson['message'];
+                window.location.href = '/failure/'+message;
             } else {
                 console.log('success');
+                window.location.href = '/success';
             }
             // The customer has been created
             // window.location.href = '/success';
@@ -96,7 +99,7 @@ function stripePaymentMethodHandler(result, email) {
             console.log(error);
             // window.location.href = '/failure/'+error;
         });
-        window.location.href = '/success';
+        // window.location.href = '/success';
     }
 }
 

@@ -58,6 +58,11 @@ class Product
      */
     private $pricingPlanId;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $stripeId;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -131,6 +136,18 @@ class Product
     public function setPricingPlanId(?string $pricingPlanId): self
     {
         $this->pricingPlanId = $pricingPlanId;
+
+        return $this;
+    }
+
+    public function getStripeId(): ?string
+    {
+        return $this->stripeId;
+    }
+
+    public function setStripeId(string $stripeId): self
+    {
+        $this->stripeId = $stripeId;
 
         return $this;
     }

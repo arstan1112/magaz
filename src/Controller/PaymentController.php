@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Stripe\{Exception\SignatureVerificationException, Stripe, PaymentIntent};
 use phpDocumentor\Reflection\Types\This;
 use Psr\Log\LoggerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -62,6 +63,7 @@ class PaymentController extends AbstractController
 
     /**
      * @Route("/payment", name="payment")
+     * @Security("ROLE_PAID")
      */
     public function show()
     {
@@ -82,34 +84,7 @@ class PaymentController extends AbstractController
     public function hook(Request $request)
     {
         $header = $request->server->get('HTTP_STRIPE_SIGNATURE');
+
         return $this->json($this->hook->hook($header));
-    }
-
-    /**
-     * @Route("/mail")
-     *
-     * @param \Swift_Mailer $mailer
-     *
-     * @return RedirectResponse
-     */
-    public function mail(\Swift_Mailer $mailer)
-    {
-
-        dump(php_sapi_name());
-        die();
-        $name = 'Kyle';
-        $message = (new \Swift_Message('Hi email'))
-            ->setFrom('slee76058@gmail.com')
-            ->setTo('stan.lee.mag@yandex.com')
-            ->setBody(
-                $this->renderView(
-                    'emails/registration.html.twig',
-                    ['name' => $name]
-                )
-            )
-            ;
-        $mailer->send($message);
-
-        return $this->redirectToRoute('products.list');
     }
 }

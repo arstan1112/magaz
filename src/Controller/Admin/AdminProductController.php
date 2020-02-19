@@ -5,8 +5,10 @@ namespace App\Controller\Admin;
 use App\Entity\Product;
 use App\Entity\User;
 use App\Form\ProductType;
+use Doctrine\Instantiator\Exception\ExceptionInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use phpDocumentor\Reflection\Types\This;
+use Stripe\Exception\ApiErrorException;
+use Stripe\{Stripe, Plan};
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,7 +50,7 @@ class AdminProductController extends AbstractController
      *
      * @return Response
      *
-     * @throws \Stripe\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     public function create(Request $request)
     {
@@ -58,22 +60,29 @@ class AdminProductController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
+            Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
 
             $productApi = \Stripe\Product::create([
                 'name' => $product->getName(),
                 'type' => 'service',
             ]);
 
-            $plan = \Stripe\Plan::create([
-                'currency' => 'usd',
-                'interval' => $form->get('pricingPlanInterval')->getData(),
-                'product'  => $productApi->id,
-                'nickname' => $form->get('pricingPlanName')->getData(),
-                'amount'   => $form->get('pricingPlanAmount')->getData(),
-            ]);
+            $product->setStripeId($productApi->id);
 
-            $product->setPricingPlanId($plan->id);
+            if (
+                $form->get('pricingPlanName')->getData() &&
+                $form->get('pricingPlanInterval')->getData() &&
+                $form->get('pricingPlanAmount')->getData()
+            ) {
+                $plan = Plan::create([
+                    'currency' => 'usd',
+                    'interval' => $form->get('pricingPlanInterval')->getData(),
+                    'product'  => $productApi->id,
+                    'nickname' => $form->get('pricingPlanName')->getData(),
+                    'amount'   => $form->get('pricingPlanAmount')->getData(),
+                ]);
+                $product->setPricingPlanId($plan->id);
+            }
 
             $this->em->persist($product);
             $this->em->flush();
@@ -86,17 +95,36 @@ class AdminProductController extends AbstractController
         ]);
     }
 
-//    /**
-//     * @Route("/attribute")
-//     */
-//    public function attr()
-//    {
-//        $products = $this->em->getRepository(User::class)->find(1);
-//        $roles[] = 'ROLE_ADMIN';
-//        $products->setRoles($roles);
-//        $this->em->persist($products);
-//        $this->em->flush();
-//        dump($products);
-//        die();
-//    }
+    /**
+     * @Route("/admin/product/{id}/delete", name="admin.product.delete", requirements={"id" = "\d+"})
+     *
+     * @param $id
+     *
+     * @return Response
+     */
+    public function delete($id)
+    {
+        $productDB = $this->em->getRepository(Product::class)->find($id);
+        $productStripeId = $productDB->getStripeId();
+
+        try {
+            \Stripe\Stripe::setApiKey('sk_test_Gw22NrsxU6aIlKApdYKsXgN700f1Ww1pAc');
+            $product = \Stripe\Product::retrieve(
+                $productStripeId
+            );
+            $product->delete();
+        } catch (ApiErrorException $e) {
+           $this->addFlash(
+                'notice',
+                'Error:'. $e->getMessage()
+            );
+            return $this->redirectToRoute('admin.products.list');
+        }
+
+        $productDB = $this->em->getRepository(Product::class)->find($id);
+        $this->em->remove($productDB);
+        $this->em->flush();
+
+        return $this->redirectToRoute('admin.products.list');
+    }
 }

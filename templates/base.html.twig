@@ -15,6 +15,12 @@
     <body>
         {% include 'navbar.html.twig' %}
 
+        {% for message in app.flashes('notice') %}
+            <div class="alert alert-danger alert-dismissible fade show">
+                {{ message }}
+            </div>
+        {% endfor %}
+
         {% block body %}{% endblock %}
 
         {{ encore_entry_script_tags('app') }}

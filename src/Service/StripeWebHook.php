@@ -248,6 +248,7 @@ class StripeWebHook
     {
         $this->logger->info('Subscription with id: ' .$deletedSubscription->id .', for Customer: ' .$deletedSubscription->customer. ', is cancelled by Customer');
         $this->mailer->send('Your subscription ' . $deletedSubscription->id . ' has been successfully cancelled', 'stan.lee.mag@yandex.com');
+
         return $deletedSubscription;
     }
 }
