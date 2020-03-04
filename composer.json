@@ -6,6 +6,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-json": "*",
+        "phpspec/prophecy": "^1.10",
         "sensio/framework-extra-bundle": "^5.1",
         "stripe/stripe-php": "^7.20",
         "symfony/asset": "5.0.*",

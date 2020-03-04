@@ -40,5 +40,4 @@ class MailerService
         ;
         $this->mailer->send($message);
     }
-
 }

@@ -3,6 +3,8 @@
 
 namespace App\Stripe;
 
+use App\Service\TestService;
+use Doctrine\ORM\EntityManagerInterface;
 use Stripe\{PaymentIntent, Stripe, Subscription, Customer};
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -13,6 +15,15 @@ class PaymentGateway
      */
     private $bag;
 
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    /**
+     * PaymentGateway constructor.
+     * @param ParameterBagInterface $bag
+     */
     public function __construct(ParameterBagInterface $bag)
     {
         $this->bag = $bag;
@@ -61,5 +72,4 @@ class PaymentGateway
 
         return $intent;
     }
-
 }
