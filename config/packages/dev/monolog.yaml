@@ -1,5 +1,5 @@
 monolog:
-    channels: [stripe_logs]
+    channels: [stripe_logs, messenger_logs]
     handlers:
         main:
             type: stream
@@ -23,3 +23,8 @@ monolog:
             path: "%kernel.logs_dir%/stripe.log"
             level: debug
             channels: ["stripe_logs"]
+        messenger:
+            type: stream
+            path: "%kernel.logs_dir%/messenger.log"
+            level: debug
+            channels: ["messenger_logs"]

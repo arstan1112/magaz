@@ -88,10 +88,10 @@ function stripePaymentMethodHandler(result, email) {
             if (status === 'error') {
                 console.log('failure');
                 let message = responseJson['message'];
-                window.location.href = '/failure/'+message;
+                // window.location.href = '/failure/'+message;
             } else {
                 console.log('success');
-                window.location.href = '/success';
+                // window.location.href = '/success';
             }
             // The customer has been created
             // window.location.href = '/success';

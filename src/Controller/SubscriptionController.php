@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Subscription;
+use App\Entity\User;
+use App\Message\SubscribeToProduct;
 use App\Stripe\PaymentGateway;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -11,6 +13,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -46,13 +51,16 @@ class SubscriptionController extends AbstractController
      *
      * @param Request $request
      *
+     * @param MessageBusInterface $messageBus
      * @return string
      *
      * @throws \Exception
-     * @throws ExceptionInterface
      */
-    public function subscribe(Request $request)
+    public function subscribe(Request $request, MessageBusInterface $messageBus)
     {
+        $strUser = $this->em->getRepository(User::class)->find($this->getUser());
+        $userId = $strUser->getId();
+
         $data = json_decode($request->getContent(), true);
 
         try {
@@ -69,26 +77,41 @@ class SubscriptionController extends AbstractController
             ]);
         }
 
-        $new_subscription = new Subscription();
-        $new_subscription->setStripeId($subscription->id);
-        $new_subscription->setCurrentPeriodEndAt(new \DateTime(strtotime($subscription->current_period_end)));
-        $new_subscription->setCurrentPeriodStartAt(new \DateTime(strtotime($subscription->current_period_start)));
-        $new_subscription->setNickname($subscription->plan->nickname);
-        $new_subscription->setRegularity($subscription->plan->interval);
-        $new_subscription->setAmount(($subscription->plan->amount)/100);
-        $new_subscription->setStatus('active');
-        $new_subscription->setCustomer($this->getUser());
+//        $subMessage = new SubscribeToProduct($subscription, $strUser);
+        $subMessage = new SubscribeToProduct($subscription, $userId);
+        $envelope = new Envelope($subMessage, [
+            new DelayStamp(3000)
+        ]);
+        $messageBus->dispatch($envelope);
 
-        $this->em->persist($new_subscription);
-        $this->em->flush();
+//        dump($messageBus->dispatch($envelope));
+//        die();
 
-        $normalizer = new ObjectNormalizer();
-        $encoder    = new JsonEncoder();
-        $serializer = new Serializer([$normalizer], [$encoder]);
+//        $new_subscription = new Subscription();
+//        $new_subscription->setStripeId($subscription->id);
+//        $new_subscription->setCurrentPeriodEndAt(new \DateTime(strtotime($subscription->current_period_end)));
+//        $new_subscription->setCurrentPeriodStartAt(new \DateTime(strtotime($subscription->current_period_start)));
+//        $new_subscription->setNickname($subscription->plan->nickname);
+//        $new_subscription->setRegularity($subscription->plan->interval);
+//        $new_subscription->setAmount(($subscription->plan->amount)/100);
+//        $new_subscription->setStatus('active');
+//        $new_subscription->setCustomer($this->getUser());
+//
+//        $this->em->persist($new_subscription);
+//        $this->em->flush();
+//
+//        $normalizer = new ObjectNormalizer();
+//        $encoder    = new JsonEncoder();
+//        $serializer = new Serializer([$normalizer], [$encoder]);
+//
+//        $serializedNewSubscriptionObject = $serializer->serialize($new_subscription, 'json', ['ignored_attributes' => ['customer']]);
+//
+//        return $this->json($serializer->decode($serializedNewSubscriptionObject, 'json'));
 
-        $serializedNewSubscriptionObject = $serializer->serialize($new_subscription, 'json', ['ignored_attributes' => ['customer']]);
-
-        return $this->json($serializer->decode($serializedNewSubscriptionObject, 'json'));
+        return $this->json([
+            'status' => 'success',
+            'message' => 'Subscription handling is in queue',
+        ]);
     }
 
     /**
