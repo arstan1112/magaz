@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Subscription;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use mysql_xdevapi\Exception;
 
 /**
  * @method Subscription|null find($id, $lockMode = null, $lockVersion = null)
@@ -21,8 +22,12 @@ class SubscriptionRepository extends ServiceEntityRepository
 
     public function save(Subscription $subscription)
     {
-        $this->_em->persist($subscription);
-        $this->_em->flush();
+        try {
+            $this->_em->persist($subscription);
+            $this->_em->flush();
+        } catch (\Exception $exception) {
+            return false;
+        }
     }
 
     public function remove(Subscription $subscription)

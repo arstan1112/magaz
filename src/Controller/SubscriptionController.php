@@ -65,6 +65,7 @@ class SubscriptionController extends AbstractController
 
         try {
             $subscription = $this->gateway->subscribe($data);
+
         } catch (\Exception $e) {
             $this->logger->warning(
                 'Stripe subscription initialization for user '
@@ -83,9 +84,6 @@ class SubscriptionController extends AbstractController
             new DelayStamp(3000)
         ]);
         $messageBus->dispatch($envelope);
-
-//        dump($messageBus->dispatch($envelope));
-//        die();
 
 //        $new_subscription = new Subscription();
 //        $new_subscription->setStripeId($subscription->id);
