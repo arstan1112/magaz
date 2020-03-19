@@ -62,9 +62,13 @@ class SubscriptionController extends AbstractController
         $userId = $strUser->getId();
 
         $data = json_decode($request->getContent(), true);
+//        dump($data);
+//        die();
+//        dd($data['email']);
 
         try {
             $subscription = $this->gateway->subscribe($data);
+            $this->logger->info('Subscription sent to Stripe');
 
         } catch (\Exception $e) {
             $this->logger->warning(
@@ -79,11 +83,12 @@ class SubscriptionController extends AbstractController
         }
 
 //        $subMessage = new SubscribeToProduct($subscription, $strUser);
-        $subMessage = new SubscribeToProduct($subscription, $userId);
+        $subMessage = new SubscribeToProduct($subscription, $userId, $data['email']);
         $envelope = new Envelope($subMessage, [
             new DelayStamp(3000)
         ]);
         $messageBus->dispatch($envelope);
+        $this->logger->info('Subscription sent to message handler');
 
 //        $new_subscription = new Subscription();
 //        $new_subscription->setStripeId($subscription->id);

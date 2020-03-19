@@ -35,8 +35,9 @@ class CancelSubscriptionHandler implements MessageHandlerInterface
         try {
             $subscriptionId = $cancelSubscription->getSubscriptionId();
             $subscription = $this->gateway->cancel($subscriptionId);
+            $this->stripeLogger->info('Subscription cancelling in handler');
         } catch (\Throwable $exception) {
-            $this->stripeLogger->error('werwer');
+            $this->stripeLogger->error($exception->getMessage());
         }
 
 

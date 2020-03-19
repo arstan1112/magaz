@@ -19,10 +19,16 @@ class SubscribeToProduct
      */
     private $userId;
 
-    public function __construct(Subscription $subscription, int $userId)
+    /**
+     * @var string
+     */
+    private $email;
+
+    public function __construct(Subscription $subscription, int $userId, string $email)
     {
         $this->subscription = $subscription;
         $this->userId = $userId;
+        $this->email = $email;
     }
 
     /**
@@ -39,6 +45,14 @@ class SubscribeToProduct
     public function getUserId(): int
     {
         return $this->userId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail(): string
+    {
+        return $this->email;
     }
 
 }

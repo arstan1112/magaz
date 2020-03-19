@@ -27,6 +27,7 @@ class SubscribeToProductHandler implements MessageHandlerInterface
         $subscription = $subscribeToProduct->getSubscription();
 //        $user = $subscribeToProduct->getUser();
         $user = $this->em->getRepository(User::class)->find($subscribeToProduct->getUserId());
+        $email = $subscribeToProduct->getEmail();
 
         $new_subscription = new Subscription();
         $new_subscription->setStripeId($subscription->id);
@@ -37,11 +38,11 @@ class SubscribeToProductHandler implements MessageHandlerInterface
         $new_subscription->setAmount(($subscription->plan->amount)/100);
         $new_subscription->setStatus('active');
         $new_subscription->setCustomer($user);
-
+        $new_subscription->setCustomerEmail($email);
+    
         $this->em->persist($new_subscription);
         $this->em->flush();
 
 //        throw new \Exception('Some exception');
     }
-
 }

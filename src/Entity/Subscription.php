@@ -64,6 +64,11 @@ class Subscription
      */
     private $status;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $customer_email;
+
     public function __construct()
     {
         $this->invoices = new ArrayCollection();
@@ -197,6 +202,18 @@ class Subscription
     public function setStatus(string $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getCustomerEmail(): ?string
+    {
+        return $this->customer_email;
+    }
+
+    public function setCustomerEmail(string $customer_email): self
+    {
+        $this->customer_email = $customer_email;
 
         return $this;
     }

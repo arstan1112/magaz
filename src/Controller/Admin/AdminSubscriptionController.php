@@ -123,7 +123,7 @@ class AdminSubscriptionController extends AbstractController
             'stripeId' => $data['subscriptionId'],
         ]);
 
-        dump($subscriptionInDB);
+//        dump($subscriptionInDB);
         $subscriptionInDB->setStatus('pending');
         $this->subscriptions->save($subscriptionInDB);
 
