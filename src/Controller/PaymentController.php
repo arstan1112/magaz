@@ -46,18 +46,17 @@ class PaymentController extends AbstractController
      * PaymentController constructor.
      * @param EntityManagerInterface $em
      * @param PaymentGateway $gateway
-     * @param LoggerInterface $stripeLogger
      * @param StripeWebHook $hook
      */
     public function __construct(
         EntityManagerInterface $em,
         PaymentGateway         $gateway,
-        LoggerInterface        $stripeLogger,
+//        LoggerInterface        $stripeLogger,
         StripeWebHook          $hook
     ) {
         $this->em      = $em;
         $this->gateway = $gateway;
-        $this->logger  = $stripeLogger;
+//        $this->logger  = $stripeLogger;
         $this->hook    = $hook;
     }
 

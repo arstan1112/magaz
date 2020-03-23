@@ -37,83 +37,58 @@ class SubscriptionController extends AbstractController
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    private $stripeLogger;
 
     public function __construct(EntityManagerInterface $em, PaymentGateway $gateway, LoggerInterface $stripeLogger)
     {
         $this->em      = $em;
         $this->gateway = $gateway;
-        $this->logger  = $stripeLogger;
+        $this->stripeLogger  = $stripeLogger;
     }
 
     /**
      * @Route("/subscribe", name="subscribe", methods={"POST"})
      *
      * @param Request $request
-     *
      * @param MessageBusInterface $messageBus
      * @return string
-     *
-     * @throws \Exception
      */
     public function subscribe(Request $request, MessageBusInterface $messageBus)
     {
-        $strUser = $this->em->getRepository(User::class)->find($this->getUser());
-        $userId = $strUser->getId();
-
         $data = json_decode($request->getContent(), true);
-//        dump($data);
-//        die();
-//        dd($data['email']);
+//        dd($data);
 
         try {
             $subscription = $this->gateway->subscribe($data);
-            $this->logger->info('Subscription sent to Stripe');
+            $this->stripeLogger->info('[SubscriptionController.php] Subscription sent to Stripe');
 
         } catch (\Exception $e) {
-            $this->logger->warning(
-                'Stripe subscription initialization for user '
+            $this->stripeLogger->warning(
+                '[SubscriptionController.php] Stripe subscription initialization for user '
                 .$this->getUser()->getUsername().
                 ' failed with Exception: '. $e->getMessage()
             );
             return $this->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ]);
+            ], 302);
         }
 
-//        $subMessage = new SubscribeToProduct($subscription, $strUser);
+        $currentUser = $this->em->getRepository(User::class)->find($this->getUser());
+        $userId = $currentUser->getId();
+//        $userId = 4;
         $subMessage = new SubscribeToProduct($subscription, $userId, $data['email']);
-        $envelope = new Envelope($subMessage, [
-            new DelayStamp(3000)
-        ]);
-        $messageBus->dispatch($envelope);
-        $this->logger->info('Subscription sent to message handler');
+//        $envelope = new Envelope($subMessage, [
+//            new DelayStamp(3000)
+//        ]);
 
-//        $new_subscription = new Subscription();
-//        $new_subscription->setStripeId($subscription->id);
-//        $new_subscription->setCurrentPeriodEndAt(new \DateTime(strtotime($subscription->current_period_end)));
-//        $new_subscription->setCurrentPeriodStartAt(new \DateTime(strtotime($subscription->current_period_start)));
-//        $new_subscription->setNickname($subscription->plan->nickname);
-//        $new_subscription->setRegularity($subscription->plan->interval);
-//        $new_subscription->setAmount(($subscription->plan->amount)/100);
-//        $new_subscription->setStatus('active');
-//        $new_subscription->setCustomer($this->getUser());
-//
-//        $this->em->persist($new_subscription);
-//        $this->em->flush();
-//
-//        $normalizer = new ObjectNormalizer();
-//        $encoder    = new JsonEncoder();
-//        $serializer = new Serializer([$normalizer], [$encoder]);
-//
-//        $serializedNewSubscriptionObject = $serializer->serialize($new_subscription, 'json', ['ignored_attributes' => ['customer']]);
-//
-//        return $this->json($serializer->decode($serializedNewSubscriptionObject, 'json'));
+        $envelope = new Envelope($subMessage);
+        $messageBus->dispatch($envelope);
+        $this->stripeLogger->info('[SubscriptionController.php] Subscription sent to message handler');
 
         return $this->json([
             'status' => 'success',
-            'message' => 'Subscription handling is in queue',
+            'message' => 'Subscription sent to Stripe and is handling by messenger handler',
         ]);
     }
 

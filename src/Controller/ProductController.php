@@ -38,6 +38,7 @@ class ProductController extends AbstractController
 //        $this->em->flush();
 //        dump($user);
 //        die();
+//        dd(__DIR__);
 
         $products = $this->em->getRepository(Product::class)->findAllDesc();
         return $this->render('product/list.html.twig', [

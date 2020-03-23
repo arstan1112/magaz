@@ -25,7 +25,6 @@ class SubscribeToProductHandler implements MessageHandlerInterface
     public function __invoke(SubscribeToProduct $subscribeToProduct)
     {
         $subscription = $subscribeToProduct->getSubscription();
-//        $user = $subscribeToProduct->getUser();
         $user = $this->em->getRepository(User::class)->find($subscribeToProduct->getUserId());
         $email = $subscribeToProduct->getEmail();
 
@@ -43,6 +42,11 @@ class SubscribeToProductHandler implements MessageHandlerInterface
         $this->em->persist($new_subscription);
         $this->em->flush();
 
-//        throw new \Exception('Some exception');
+//        $normalizer = new ObjectNormalizer();
+//        $encoder    = new JsonEncoder();
+//        $serializer = new Serializer([$normalizer], [$encoder]);
+//        $serializedNewSubscriptionObject = $serializer->serialize($new_subscription, 'json', ['ignored_attributes' => ['customer']]);
+//        return $this->json($serializer->decode($serializedNewSubscriptionObject, 'json'));
+
     }
 }

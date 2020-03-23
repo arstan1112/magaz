@@ -35,20 +35,13 @@ class AdminSubscriptionController extends AbstractController
     private $subscriptions;
 
     /**
-     * @var LoggerInterface
-     */
-    private $stripeLogger;
-
-    /**
      * @param SubscriptionRepository $subscriptions
      * @param PaymentGateway $gateway
-     * @param LoggerInterface $stripeLogger
      */
-    public function __construct(SubscriptionRepository $subscriptions, PaymentGateway $gateway, LoggerInterface $stripeLogger)
+    public function __construct(SubscriptionRepository $subscriptions, PaymentGateway $gateway)
     {
         $this->gateway = $gateway;
         $this->subscriptions = $subscriptions;
-        $this->stripeLogger = $stripeLogger;
     }
 
     /**
@@ -107,30 +100,15 @@ class AdminSubscriptionController extends AbstractController
         ]);
         $messageBus->dispatch($envelope);
 
-//        try {
-//            $subscription = $this->gateway->cancel($data['subscriptionId']);
-//        } catch (\Exception $exception) {
-//            $this->stripeLogger->error($exception->getMessage());
-//
-//            return $this->json([
-//               'status' => 'error',
-//               'message' => $exception->getMessage(),
-//            ]);
-//        }
-
         $subscriptionInDB = $this->subscriptions->findOneBy([
-//            'stripeId' => $subscription->id,
             'stripeId' => $data['subscriptionId'],
         ]);
 
-//        dump($subscriptionInDB);
         $subscriptionInDB->setStatus('pending');
         $this->subscriptions->save($subscriptionInDB);
 
         return $this->json([
             'status' => 'success',
-//            '$subscription->id' => $subscription->id,
-//            '$data[subscr__id]' => $data['subscriptionId'],
         ]);
     }
 }
