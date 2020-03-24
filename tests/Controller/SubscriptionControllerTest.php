@@ -17,6 +17,7 @@ use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Transport\InMemoryTransport;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class SubscriptionControllerTest extends WebTestCase
@@ -78,12 +79,17 @@ class SubscriptionControllerTest extends WebTestCase
 //        $client = static::createClient();
         $client = $this->createAuthorizedClient();
 
-        $client->request('POST', 'subscribe', [], [], [], '{"email":"user_test2@loc.loc","payment_method":"pm_1GPu8kCCGgik3dC7QC98458S","pricing_plan":"plan_GgQebDnr5PqPVh"}');
+        $client->request('POST', 'subscribe', [], [], [], '{"email":"user_test3@loc.loc","payment_method":"pm_1GQ8mUCCGgik3dC7AhvaoZHf","pricing_plan":"plan_GgQebDnr5PqPVh"}');
 //        $client->request('POST', 'subscribe');
+
+        /** @var InMemoryTransport $transport */
+        $transport = self::$container->get('messenger.transport.async');
+        $this->assertCount(1, $transport->get());
+//        dd($transport);
 
         $this->assertEquals(3,3);
 //        $this->assertResponseIsSuccessful();
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+//        $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 
     protected function createAuthorizedClient()

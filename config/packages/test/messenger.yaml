@@ -12,11 +12,11 @@ framework:
       # https://symfony.com/doc/current/messenger.html#transport-configuration
       async:
 #        dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
-        dsn: 'sync://'
+        dsn: 'in-memory://'
 
       async_priority_high:
 #        dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
-        dsn: 'sync://'
+        dsn: 'in-memory://'
         options:
           queue_name: high
 

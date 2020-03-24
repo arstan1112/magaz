@@ -93,6 +93,7 @@ class AdminSubscriptionController extends AbstractController
     public function cancel(Request $request, MessageBusInterface $messageBus)
     {
         $data = json_decode($request->getContent(), true);
+//        dd($request->getContent());
 
         $cancelMessage = new CancelSubscription($data['subscriptionId']);
         $envelope = new Envelope($cancelMessage, [
